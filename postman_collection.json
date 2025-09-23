@@ -1,0 +1,132 @@
+{
+  "API_POSTMAN_COLLECTION": {
+    "info": {
+      "name": "API Urna Eletrônica",
+      "description": "Coleção completa de endpoints da API de Urna Eletrônica",
+      "version": "1.0.0"
+    },
+    "folders": [
+      {
+        "name": "Autenticação",
+        "description": "Endpoints de autenticação e autorização",
+        "requests": [
+          {
+            "name": "Login",
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/auth/login",
+            "headers": {
+              "Content-Type": "application/json"
+            },
+            "body": {
+              "email": "admin@urna.com",
+              "senha": "admin123"
+            }
+          },
+          {
+            "name": "Obter Perfil",
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/auth/me",
+            "headers": {
+              "Authorization": "Bearer {{token}}"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Dashboard",
+        "requests": [
+          {
+            "name": "Estatísticas Gerais",
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/dashboard/summary",
+            "headers": {
+              "Authorization": "Bearer {{token}}"
+            }
+          },
+          {
+            "name": "Status das Urnas",
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/dashboard/urnas-status",
+            "headers": {
+              "Authorization": "Bearer {{token}}"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Eleições",
+        "requests": [
+          {
+            "name": "Listar Eleições",
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/eleicoes",
+            "headers": {
+              "Authorization": "Bearer {{token}}"
+            }
+          },
+          {
+            "name": "Criar Eleição",
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/eleicoes",
+            "headers": {
+              "Authorization": "Bearer {{token}}",
+              "Content-Type": "application/json"
+            },
+            "body": {
+              "titulo": "Nova Eleição",
+              "descricao": "Descrição da eleição",
+              "data_inicio": "2024-01-15T08:00:00Z",
+              "data_fim": "2024-01-15T17:00:00Z"
+            }
+          }
+        ]
+      },
+      {
+        "name": "Urna - Votação",
+        "description": "Endpoints utilizados pelo tablet de votação",
+        "requests": [
+          {
+            "name": "Validar Eleitor",
+            "method": "POST",
+            "url": "{{baseUrl}}/api/eleitores/validar",
+            "headers": {
+              "Content-Type": "application/json"
+            },
+            "body": {
+              "matricula": "00000001"
+            }
+          },
+          {
+            "name": "Obter Candidatos",
+            "method": "GET",
+            "url": "{{baseUrl}}/api/candidatos"
+          },
+          {
+            "name": "Registrar Voto",
+            "method": "POST",
+            "url": "{{baseUrl}}/api/votos",
+            "headers": {
+              "Content-Type": "application/json"
+            },
+            "body": {
+              "idCandidato": "{{candidatoId}}",
+              "eleitorMatricula": "00000001"
+            }
+          }
+        ]
+      }
+    ],
+    "variables": [
+      {
+        "key": "baseUrl",
+        "value": "http://localhost:3001",
+        "description": "URL base da API"
+      },
+      {
+        "key": "token",
+        "value": "",
+        "description": "Token JWT obtido no login"
+      }
+    ]
+  }
+}

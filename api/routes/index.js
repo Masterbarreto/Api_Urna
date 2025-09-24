@@ -46,4 +46,69 @@ router.get('/docs', (req, res) => {
   });
 });
 
+// Rota temporária para setup inicial (criar admin)
+router.post('/setup', async (req, res) => {
+  try {
+    const bcrypt = require('bcryptjs');
+    const { supabase } = require('../config/supabase');
+    
+    // Verificar se já existe admin
+    const { data: existingAdmin } = await supabase
+      .from('usuarios')
+      .select('id')
+      .eq('email', 'admin@urna.com')
+      .single();
+      
+    if (existingAdmin) {
+      return res.status(400).json({
+        success: false,
+        message: 'Usuário administrador já existe'
+      });
+    }
+    
+    // Criar usuário administrador
+    const senhaAdmin = await bcrypt.hash('admin123', 12);
+    const { data: admin, error: adminError } = await supabase
+      .from('usuarios')
+      .insert([
+        {
+          nome: 'Administrador',
+          email: 'admin@urna.com',
+          senha_hash: senhaAdmin,
+          tipo: 'admin',
+          ativo: true
+        }
+      ])
+      .select('id, nome, email, tipo')
+      .single();
+
+    if (adminError) {
+      throw adminError;
+    }
+
+    res.status(201).json({
+      success: true,
+      message: '🎉 Usuário administrador criado com sucesso!',
+      data: {
+        id: admin.id,
+        nome: admin.nome,
+        email: admin.email,
+        tipo: admin.tipo
+      },
+      credentials: {
+        email: 'admin@urna.com',
+        senha: 'admin123'
+      }
+    });
+    
+  } catch (error) {
+    console.error('Erro ao criar admin:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Erro ao criar usuário administrador',
+      error: error.message
+    });
+  }
+});
+
 module.exports = router;

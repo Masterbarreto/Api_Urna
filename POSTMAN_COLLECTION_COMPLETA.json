@@ -1,0 +1,824 @@
+{
+	"info": {
+		"_postman_id": "e4f5b2a8-5678-9012-3456-789012345678",
+		"name": "🗳️ API Urna Eletrônica - TESTE COMPLETO",
+		"description": "Collection completa para testar TODA a API da Urna Eletrônica\n\n🌐 **URL Base**: https://api-urna.onrender.com\n\n## 📋 ORDEM DE EXECUÇÃO:\n1. **Health Check** → Verificar se API está online\n2. **Login Admin** → Obter token de autenticação  \n3. **Criar Eleição** → Base para todos os dados\n4. **Criar Urnas** → Locais de votação\n5. **Criar Candidatos** → Pessoas para votar\n6. **Criar Eleitores** → Quem pode votar\n7. **Testar Votação** → Simular processo real\n8. **Consultar Resultados** → Ver estatísticas\n\n## 🔑 IMPORTANTE:\n- Execute as requests **NA ORDEM**\n- **COPIE os IDs** retornados para usar nas próximas requests\n- Token expira - faça login novamente se necessário\n\n## ⚠️ TROUBLESHOOTING:\n- 401 = Token inválido → Faça login\n- 400 = Dados inválidos → Verifique formato\n- 404 = ID não encontrado → Use IDs corretos",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "🔥 1. VERIFICAÇÃO INICIAL",
+			"item": [
+				{
+					"name": "Health Check",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"✅ API está online\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"✅ Status é OK\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql(\"OK\");",
+									"});",
+									"",
+									"console.log(\"🚀 API da Urna Eletrônica está funcionando!\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/health",
+							"host": ["{{base_url}}"],
+							"path": ["health"]
+						},
+						"description": "Verifica se a API está online e funcionando"
+					}
+				},
+				{
+					"name": "Documentação da API",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"✅ Documentação carregada\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"✅ Endpoints listados\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.endpoints).to.exist;",
+									"});",
+									"",
+									"console.log(\"📚 Documentação da API disponível!\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/docs",
+							"host": ["{{base_url}}"],
+							"path": ["api", "docs"]
+						},
+						"description": "Lista todos os endpoints disponíveis na API"
+					}
+				}
+			]
+		},
+		{
+			"name": "🔐 2. AUTENTICAÇÃO",
+			"item": [
+				{
+					"name": "Login Admin (OBRIGATÓRIO)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.token) {",
+									"        pm.environment.set(\"token\", jsonData.token);",
+									"        pm.environment.set(\"user_id\", jsonData.user.id);",
+									"        console.log(\"🔑 Token salvo com sucesso!\");",
+									"        console.log(\"👤 Usuário:\", jsonData.user.email);",
+									"    }",
+									"}",
+									"",
+									"pm.test(\"✅ Login realizado com sucesso\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"✅ Token recebido\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.token).to.exist;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"admin@urna.com\",\n  \"senha\": \"admin123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/login",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "login"]
+						},
+						"description": "🚨 EXECUTE PRIMEIRO! Faz login e salva o token automaticamente"
+					}
+				}
+			]
+		},
+		{
+			"name": "📊 3. CRIAR ELEIÇÃO",
+			"item": [
+				{
+					"name": "Criar Eleição (Base para tudo)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.data && jsonData.data.id) {",
+									"        pm.environment.set(\"eleicao_id\", jsonData.data.id);",
+									"        console.log(\"🗳️ Eleição criada! ID:\", jsonData.data.id);",
+									"        console.log(\"📋 Título:\", jsonData.data.titulo);",
+									"    }",
+									"}",
+									"",
+									"pm.test(\"✅ Eleição criada com sucesso\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"✅ ID da eleição retornado\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.data.id).to.exist;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"titulo\": \"Eleição Municipal 2025 - Teste Postman\",\n  \"descricao\": \"Eleição de teste criada via Postman para validar todas as funcionalidades do sistema\",\n  \"data_inicio\": \"2025-12-01T08:00:00.000Z\",\n  \"data_fim\": \"2025-12-01T18:00:00.000Z\",\n  \"status\": \"criada\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/eleicoes",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "eleicoes"]
+						},
+						"description": "🚨 EXECUTE SEGUNDO! Cria eleição e salva o ID automaticamente"
+					}
+				}
+			]
+		},
+		{
+			"name": "🏢 4. CRIAR URNAS",
+			"item": [
+				{
+					"name": "Criar Urna 001",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.data && jsonData.data.id) {",
+									"        pm.environment.set(\"urna_001_id\", jsonData.data.id);",
+									"        console.log(\"🏢 Urna 001 criada! ID:\", jsonData.data.id);",
+									"    }",
+									"}",
+									"",
+									"pm.test(\"✅ Urna criada com sucesso\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"numero\": \"001\",\n  \"localizacao\": \"Escola Municipal São João - Sala 101\",\n  \"status\": \"ativa\",\n  \"ip_address\": \"192.168.1.100\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/urnas",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "urnas"]
+						}
+					}
+				},
+				{
+					"name": "Criar Urna 002",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"numero\": \"002\",\n  \"localizacao\": \"Colégio Estadual Central - Auditório\",\n  \"status\": \"ativa\",\n  \"ip_address\": \"192.168.1.101\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/urnas",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "urnas"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "👥 5. CRIAR CANDIDATOS",
+			"item": [
+				{
+					"name": "Candidato 10 - João Silva",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.data && jsonData.data.id) {",
+									"        pm.environment.set(\"candidato_10_id\", jsonData.data.id);",
+									"        console.log(\"👨‍💼 Candidato 10 criado! ID:\", jsonData.data.id);",
+									"    }",
+									"}",
+									"",
+									"pm.test(\"✅ Candidato criado com sucesso\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"numero\": \"10\",\n  \"nome\": \"João Silva\",\n  \"partido\": \"Partido dos Trabalhadores\",\n  \"eleicao_id\": \"{{eleicao_id}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/candidatos",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "candidatos"]
+						}
+					}
+				},
+				{
+					"name": "Candidato 20 - Maria Santos",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.data && jsonData.data.id) {",
+									"        pm.environment.set(\"candidato_20_id\", jsonData.data.id);",
+									"        console.log(\"👩‍💼 Candidato 20 criada! ID:\", jsonData.data.id);",
+									"    }",
+									"}",
+									"",
+									"pm.test(\"✅ Candidata criada com sucesso\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"numero\": \"20\",\n  \"nome\": \"Maria Santos\",\n  \"partido\": \"Partido da Social Democracia Brasileira\",\n  \"eleicao_id\": \"{{eleicao_id}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/candidatos",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "candidatos"]
+						}
+					}
+				},
+				{
+					"name": "Candidato 30 - Carlos Oliveira",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"numero\": \"30\",\n  \"nome\": \"Carlos Oliveira\",\n  \"partido\": \"Movimento Democrático Brasileiro\",\n  \"eleicao_id\": \"{{eleicao_id}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/candidatos",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "candidatos"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "🗳️ 6. CRIAR ELEITORES",
+			"item": [
+				{
+					"name": "Eleitor EL001 - Pedro",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"matricula\": \"EL001\",\n  \"nome\": \"Pedro Oliveira\",\n  \"cpf\": \"12345678901\",\n  \"email\": \"pedro.oliveira@email.com\",\n  \"telefone\": \"(11) 98765-4321\",\n  \"eleicao_id\": \"{{eleicao_id}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/eleitores",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "eleitores"]
+						}
+					}
+				},
+				{
+					"name": "Eleitor EL002 - Ana",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"matricula\": \"EL002\",\n  \"nome\": \"Ana Costa\",\n  \"cpf\": \"98765432109\",\n  \"email\": \"ana.costa@email.com\",\n  \"telefone\": \"(11) 91234-5678\",\n  \"eleicao_id\": \"{{eleicao_id}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/eleitores",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "eleitores"]
+						}
+					}
+				},
+				{
+					"name": "Eleitor EL003 - Bruno",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"matricula\": \"EL003\",\n  \"nome\": \"Bruno Lima\",\n  \"cpf\": \"11122233344\",\n  \"email\": \"bruno.lima@email.com\",\n  \"telefone\": \"(11) 95555-1111\",\n  \"eleicao_id\": \"{{eleicao_id}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/eleitores",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "eleitores"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "📊 7. CONSULTAR DADOS",
+			"item": [
+				{
+					"name": "Dashboard Overview",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/dashboard",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "dashboard"]
+						}
+					}
+				},
+				{
+					"name": "Listar Todas Eleições",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/eleicoes",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "eleicoes"]
+						}
+					}
+				},
+				{
+					"name": "Listar Todos Candidatos",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/candidatos",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "candidatos"]
+						}
+					}
+				},
+				{
+					"name": "Listar Todos Eleitores",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/eleitores",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "eleitores"]
+						}
+					}
+				},
+				{
+					"name": "Listar Todas Urnas",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/urnas",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "urnas"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "🗳️ 8. PROCESSO DE VOTAÇÃO",
+			"item": [
+				{
+					"name": "Validar Eleitor EL001",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"✅ Eleitor válido para votar\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"console.log(\"🗳️ Eleitor EL001 validado para votação\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"matricula\": \"EL001\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/urna-votacao/eleitores/validar",
+							"host": ["{{base_url}}"],
+							"path": ["api", "urna-votacao", "eleitores", "validar"]
+						},
+						"description": "Valida se o eleitor pode votar"
+					}
+				},
+				{
+					"name": "Voto EL001 → Candidato 10",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"✅ Voto registrado com sucesso\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"console.log(\"🗳️ Voto do EL001 registrado no Candidato 10\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"eleitor_matricula\": \"EL001\",\n  \"candidato_id\": \"{{candidato_10_id}}\",\n  \"eleicao_id\": \"{{eleicao_id}}\",\n  \"urna_id\": \"{{urna_001_id}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/urna-votacao/votos",
+							"host": ["{{base_url}}"],
+							"path": ["api", "urna-votacao", "votos"]
+						},
+						"description": "Pedro vota no candidato 10 (João Silva)"
+					}
+				},
+				{
+					"name": "Voto EL002 → Candidato 20",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"✅ Voto registrado com sucesso\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"console.log(\"🗳️ Voto do EL002 registrado no Candidato 20\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"eleitor_matricula\": \"EL002\",\n  \"candidato_id\": \"{{candidato_20_id}}\",\n  \"eleicao_id\": \"{{eleicao_id}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/urna-votacao/votos",
+							"host": ["{{base_url}}"],
+							"path": ["api", "urna-votacao", "votos"]
+						},
+						"description": "Ana vota na candidata 20 (Maria Santos)"
+					}
+				},
+				{
+					"name": "Voto EL003 → NULO",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"✅ Voto NULO registrado\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"console.log(\"🗳️ Voto NULO do EL003 registrado\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"eleitor_matricula\": \"EL003\",\n  \"candidato_id\": \"NULO\",\n  \"eleicao_id\": \"{{eleicao_id}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/urna-votacao/votos",
+							"host": ["{{base_url}}"],
+							"path": ["api", "urna-votacao", "votos"]
+						},
+						"description": "Bruno faz um voto nulo"
+					}
+				}
+			]
+		},
+		{
+			"name": "📈 9. RESULTADOS",
+			"item": [
+				{
+					"name": "Resultados da Eleição",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"✅ Resultados obtidos\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    console.log(\"📊 RESULTADOS DA ELEIÇÃO:\");",
+									"    console.log(JSON.stringify(jsonData, null, 2));",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/resultados?eleicao_id={{eleicao_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "resultados"],
+							"query": [
+								{
+									"key": "eleicao_id",
+									"value": "{{eleicao_id}}"
+								}
+							]
+						},
+						"description": "Consulta os resultados da eleição com os votos registrados"
+					}
+				},
+				{
+					"name": "Log de Auditoria",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/auditoria",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auditoria"]
+						},
+						"description": "Consulta o log de auditoria de todas as ações"
+					}
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "https://api-urna.onrender.com",
+			"type": "string"
+		}
+	]
+}

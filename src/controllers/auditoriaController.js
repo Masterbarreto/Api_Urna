@@ -24,10 +24,9 @@ const listarLogsAuditoria = async (req, res) => {
         acao,
         tabela_afetada,
         registro_id,
-        dados_antigos,
+        dados_anteriores,
         dados_novos,
         ip_address,
-        user_agent,
         created_at,
         usuarios(nome, email)
       `, { count: 'exact' });
@@ -72,10 +71,9 @@ const listarLogsAuditoria = async (req, res) => {
         nome: log.usuarios.nome,
         email: log.usuarios.email
       } : null,
-      dadosAntigos: log.dados_antigos,
+      dadosAntigos: log.dados_anteriores,
       dadosNovos: log.dados_novos,
       ipAddress: log.ip_address,
-      userAgent: log.user_agent,
       dataHora: log.created_at,
       dataHoraFormatada: new Date(log.created_at).toLocaleString('pt-BR')
     })) || [];
@@ -232,10 +230,9 @@ const obterLogAuditoria = async (req, res) => {
         acao,
         tabela_afetada,
         registro_id,
-        dados_antigos,
+        dados_anteriores,
         dados_novos,
         ip_address,
-        user_agent,
         created_at,
         usuarios(nome, email, tipo)
       `)
@@ -260,10 +257,9 @@ const obterLogAuditoria = async (req, res) => {
         email: log.usuarios.email,
         tipo: log.usuarios.tipo
       } : null,
-      dadosAntigos: log.dados_antigos,
+      dadosAntigos: log.dados_anteriores,
       dadosNovos: log.dados_novos,
       ipAddress: log.ip_address,
-      userAgent: log.user_agent,
       dataHora: log.created_at,
       dataHoraFormatada: new Date(log.created_at).toLocaleString('pt-BR')
     };

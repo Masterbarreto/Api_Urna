@@ -23,7 +23,6 @@ const listarUrnas = async (req, res) => {
         ultimo_ping,
         total_votos,
         created_at,
-        updated_at,
         eleicoes(titulo)
       `, { count: 'exact' });
 
@@ -101,7 +100,6 @@ const obterUrna = async (req, res) => {
         ultimo_ping,
         total_votos,
         created_at,
-        updated_at,
         eleicoes(id, titulo, status)
       `)
       .eq('id', id)

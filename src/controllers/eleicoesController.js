@@ -19,8 +19,7 @@ const listarEleicoes = async (req, res) => {
         status,
         total_votos,
         total_eleitores,
-        created_at,
-        updated_at
+        created_at
       `, { count: 'exact' });
 
     if (search) {
@@ -69,7 +68,6 @@ const obterEleicao = async (req, res) => {
         total_votos,
         total_eleitores,
         created_at,
-        updated_at,
         candidatos(id, numero, nome, partido, total_votos)
       `)
       .eq('id', id)

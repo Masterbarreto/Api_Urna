@@ -87,29 +87,36 @@ const validarEleitor = async (req, res) => {
 // Controller para obter candidatos da eleição ativa
 const getCandidatos = async (req, res) => {
   try {
-    // Buscar eleição ativa
-    const { data: eleicaoAtiva, error: eleicaoError } = await supabase
-      .from('eleicoes')
-      .select('id')
-      .eq('status', 'ativa')
-      .single();
+    // Permitir eleicao_id via query parameter ou buscar eleição ativa
+    let eleicaoId = req.query.eleicao_id;
+    
+    if (!eleicaoId) {
+      // Buscar eleição ativa
+      const { data: eleicaoAtiva, error: eleicaoError } = await supabase
+        .from('eleicoes')
+        .select('id')
+        .eq('status', 'ativa')
+        .single();
 
-    if (eleicaoError || !eleicaoAtiva) {
-      return errorResponse(res, 'Nenhuma eleição ativa encontrada', 404);
+      if (eleicaoError || !eleicaoAtiva) {
+        return errorResponse(res, 'Nenhuma eleição ativa encontrada', 404);
+      }
+      
+      eleicaoId = eleicaoAtiva.id;
     }
 
-    // Buscar candidatos da eleição ativa
+    // Buscar candidatos da eleição
     const { data: candidatos, error } = await supabase
       .from('candidatos')
       .select('id, numero, nome, partido, foto_url')
-      .eq('eleicao_id', eleicaoAtiva.id)
+      .eq('eleicao_id', eleicaoId)
       .order('numero');
 
     if (error) {
       throw error;
     }
 
-    logger.info(`Lista de candidatos solicitada - Eleição: ${eleicaoAtiva.id}`);
+    logger.info(`Lista de candidatos solicitada - Eleição: ${eleicaoId}`);
 
     return successResponse(res, candidatos, 'Candidatos obtidos com sucesso');
 

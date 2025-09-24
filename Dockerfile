@@ -1,4 +1,5 @@
-FROM node:18-alpine
+# Use uma versão específica para evitar problemas de rate limit
+FROM node:18.17.0-alpine3.18
 
 # Instalar dependências do sistema
 RUN apk add --no-cache \

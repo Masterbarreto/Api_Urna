@@ -4,8 +4,8 @@ const {
   generateToken, 
   successResponse, 
   errorResponse 
-} = require('../../utils/helpers');
-const logger = require('../../utils/logger');
+} = require('../utils/helpers');
+const logger = require('../utils/logger');
 
 // Controller para login
 const login = async (req, res) => {

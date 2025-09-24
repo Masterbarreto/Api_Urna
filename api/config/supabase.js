@@ -1,5 +1,5 @@
 const { createClient } = require('@supabase/supabase-js');
-const logger = require('../../utils/logger');
+const logger = require('../utils/logger');
 
 // Validação das variáveis de ambiente
 if (!process.env.SUPABASE_URL) {

@@ -1,6 +1,6 @@
-const { verifyToken, errorResponse } = require('../../utils/helpers');
+const { verifyToken, errorResponse } = require('../utils/helpers');
 const { supabase } = require('../config/supabase');
-const logger = require('../../utils/logger');
+const logger = require('../utils/logger');
 
 // Middleware de autenticação JWT
 const authenticateToken = async (req, res, next) => {

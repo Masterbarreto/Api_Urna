@@ -96,7 +96,7 @@ const obterEleitor = async (req, res) => {
 // Controller para criar um novo eleitor
 const criarEleitor = async (req, res) => {
   try {
-    const { matricula, nome, cpf, email, telefone, eleicao_id } = req.body;
+    const { matricula, nome, cpf, email, eleicao_id } = req.body;
 
     // Validar CPF
     if (!isValidCPF(cpf)) {
@@ -134,7 +134,6 @@ const criarEleitor = async (req, res) => {
         nome,
         cpf: cpf.replace(/\D/g, ''), // Remover formatação do CPF
         email,
-        telefone,
         eleicao_id
       })
       .select()
@@ -156,7 +155,7 @@ const criarEleitor = async (req, res) => {
 const atualizarEleitor = async (req, res) => {
   try {
     const { id } = req.params;
-    const { matricula, nome, cpf, email, telefone, eleicao_id } = req.body;
+    const { matricula, nome, cpf, email, eleicao_id } = req.body;
 
     // Validar CPF
     if (cpf && !isValidCPF(cpf)) {
@@ -212,7 +211,6 @@ const atualizarEleitor = async (req, res) => {
         nome,
         cpf: cpfLimpo,
         email,
-        telefone,
         eleicao_id
       })
       .eq('id', id)

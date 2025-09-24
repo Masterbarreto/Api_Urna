@@ -1,15 +1,23 @@
-# Usar imagem oficial mais estável
-FROM node:18-slim
+# Usar imagem base do Ubuntu com Node.js instalado manualmente
+FROM ubuntu:20.04
 
-# Instalar dependências do sistema
+# Configurar timezone para evitar prompts interativos
+ENV TZ=America/Sao_Paulo
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Instalar Node.js e dependências
 RUN apt-get update && apt-get install -y \
-    python3 \
+    curl \
     build-essential \
+    python3 \
+    python3-pip \
     libcairo2-dev \
     libjpeg-dev \
     libpango1.0-dev \
     libgif-dev \
     librsvg2-dev \
+    && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && apt-get install -y nodejs \
     && rm -rf /var/lib/apt/lists/*
 
 # Definir diretório de trabalho

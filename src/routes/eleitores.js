@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
+const Joi = require('joi');
 
 const eleitoresController = require('../controllers/eleitoresController');
 const { authenticateToken, requireAdmin, requireOperator } = require('../middlewares/auth');
@@ -77,6 +78,17 @@ router.delete('/:id',
   validateUUID(),
   auditLogger('excluir eleitor'),
   eleitoresController.excluirEleitor
+);
+
+// Rota para validar eleitor pela matrícula - POST /api/v1/eleitores/validar
+router.post('/validar',
+  requireOperator,
+  validateSchema(Joi.object({
+    matricula: Joi.string().required().messages({
+      'any.required': 'Matrícula é obrigatória'
+    })
+  })),
+  eleitoresController.validarEleitorPorMatricula
 );
 
 module.exports = router;

@@ -460,11 +460,84 @@ const inserirEleitores = async (eleitores, eleicao_id) => {
   };
 };
 
+// Controller para validar eleitor pela matrícula
+const validarEleitorPorMatricula = async (req, res) => {
+  try {
+    const { matricula } = req.body;
+
+    if (!matricula) {
+      return errorResponse(res, 'Matrícula é obrigatória', 400);
+    }
+
+    // Buscar eleitor no banco de dados
+    const { data: eleitor, error } = await supabase
+      .from('eleitores')
+      .select(`
+        id,
+        matricula,
+        nome,
+        cpf,
+        ja_votou,
+        horario_voto,
+        eleicoes(
+          id,
+          titulo,
+          status,
+          data_inicio,
+          data_fim
+        )
+      `)
+      .eq('matricula', matricula)
+      .single();
+
+    if (error || !eleitor) {
+      logger.warn(`Tentativa de validação com matrícula inexistente: ${matricula}`);
+      return errorResponse(res, 'Eleitor não encontrado com essa matrícula', 404);
+    }
+
+    // Verificar se há eleição ativa (se houver relacionamento)
+    let statusEleicao = 'sem_eleicao';
+    if (eleitor.eleicoes) {
+      const eleicao = eleitor.eleicoes;
+      const agora = new Date();
+      const dataInicio = new Date(eleicao.data_inicio);
+      const dataFim = new Date(eleicao.data_fim);
+
+      if (eleicao.status === 'ativa' && agora >= dataInicio && agora <= dataFim) {
+        statusEleicao = 'ativo';
+      } else {
+        statusEleicao = 'eleicao_inativa';
+      }
+    }
+
+    logger.info(`Eleitor validado por matrícula: ${matricula}`);
+
+    return successResponse(res, {
+      eleitor: {
+        id: eleitor.id,
+        nome: eleitor.nome,
+        matricula: eleitor.matricula,
+        cpf: eleitor.cpf,
+        ja_votou: eleitor.ja_votou,
+        horario_voto: eleitor.horario_voto
+      },
+      eleicao: eleitor.eleicoes || null,
+      status: statusEleicao,
+      apto_para_votar: !eleitor.ja_votou && statusEleicao === 'ativo'
+    }, 'Eleitor encontrado com sucesso');
+
+  } catch (error) {
+    logger.error('Erro ao validar eleitor:', error);
+    return errorResponse(res, 'Erro interno do servidor', 500);
+  }
+};
+
 module.exports = {
   listarEleitores,
   obterEleitor,
   criarEleitor,
   atualizarEleitor,
   excluirEleitor,
-  importarEleitores
+  importarEleitores,
+  validarEleitorPorMatricula
 };

@@ -96,7 +96,22 @@ const obterEleitor = async (req, res) => {
 // Controller para criar um novo eleitor
 const criarEleitor = async (req, res) => {
   try {
-    const { matricula, nome, cpf, email, eleicao_id } = req.body;
+    const { nome, cpf, matricula } = req.body;
+
+    // Buscar a eleição ativa mais recente
+    const { data: eleicaoAtiva } = await supabase
+      .from('eleicoes')
+      .select('id')
+      .in('status', ['criada', 'ativa'])
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single();
+    
+    if (!eleicaoAtiva) {
+      return errorResponse(res, 'Nenhuma eleição disponível encontrada', 400);
+    }
+    
+    const eleicao_id = eleicaoAtiva.id;
 
     // Validar CPF
     if (!isValidCPF(cpf)) {
@@ -130,11 +145,11 @@ const criarEleitor = async (req, res) => {
     const { data: eleitor, error } = await supabase
       .from('eleitores')
       .insert({
-        matricula,
         nome,
         cpf: cpf.replace(/\D/g, ''), // Remover formatação do CPF
-        email,
-        eleicao_id
+        matricula,
+        eleicao_id,
+        email: null // Email será sempre null
       })
       .select()
       .single();

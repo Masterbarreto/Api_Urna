@@ -59,20 +59,15 @@ const candidatoSchema = Joi.object({
 
 // Validação para eleitor
 const eleitorSchema = Joi.object({
-  matricula: Joi.string().required().messages({
-    'any.required': 'Matrícula é obrigatória'
-  }),
   nome: Joi.string().required().messages({
-    'any.required': 'Nome do eleitor é obrigatório'
+    'any.required': 'Nome completo é obrigatório'
   }),
   cpf: Joi.string().pattern(/^\d{11}$/).required().messages({
     'string.pattern.base': 'CPF deve conter 11 dígitos',
     'any.required': 'CPF é obrigatório'
   }),
-  email: Joi.string().email().allow('').optional(),
-  telefone: Joi.string().allow('').optional(),
-  eleicao_id: Joi.string().uuid().required().messages({
-    'any.required': 'ID da eleição é obrigatório'
+  matricula: Joi.string().required().messages({
+    'any.required': 'Matrícula é obrigatória'
   })
 });
 

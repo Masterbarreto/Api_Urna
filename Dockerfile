@@ -1,20 +1,16 @@
-# Use uma versão específica para evitar problemas de rate limit
-FROM node:18.17.0-alpine3.18
+# Usar imagem oficial mais estável
+FROM node:18-slim
 
 # Instalar dependências do sistema
-RUN apk add --no-cache \
+RUN apt-get update && apt-get install -y \
     python3 \
-    make \
-    g++ \
-    cairo-dev \
-    jpeg-dev \
-    pango-dev \
-    musl-dev \
-    giflib-dev \
-    pixman-dev \
-    pangomm-dev \
-    libjpeg-turbo-dev \
-    freetype-dev
+    build-essential \
+    libcairo2-dev \
+    libjpeg-dev \
+    libpango1.0-dev \
+    libgif-dev \
+    librsvg2-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 # Definir diretório de trabalho
 WORKDIR /app

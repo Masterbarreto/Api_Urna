@@ -42,19 +42,16 @@ const eleicaoSchema = Joi.object({
 
 // Validação para candidato
 const candidatoSchema = Joi.object({
+  nome: Joi.string().required().messages({
+    'any.required': 'Nome completo é obrigatório'
+  }),
   numero: Joi.string().required().messages({
     'any.required': 'Número do candidato é obrigatório'
   }),
-  nome: Joi.string().required().messages({
-    'any.required': 'Nome do candidato é obrigatório'
-  }),
-  partido: Joi.string().required().messages({
-    'any.required': 'Partido é obrigatório'
-  }),
   eleicao_id: Joi.string().uuid().required().messages({
-    'any.required': 'ID da eleição é obrigatório'
+    'any.required': 'Eleição é obrigatória'
   }),
-  foto_url: Joi.string().uri().allow('').optional()
+  foto_url: Joi.string().uri().allow('', null).optional()
 });
 
 // Validação para eleitor

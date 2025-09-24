@@ -88,7 +88,11 @@ const obterCandidato = async (req, res) => {
 // Controller para criar um novo candidato
 const criarCandidato = async (req, res) => {
   try {
-    const { numero, nome, partido, eleicao_id } = req.body;
+    const { numero, nome, eleicao_id } = req.body;
+    let { foto_url } = req.body;
+    
+    // Usar partido padrão se não fornecido
+    const partido = "Independente";
     
     // Verificar se o número do candidato já existe na eleição
     const { data: candidatoExistente } = await supabase
@@ -121,10 +125,13 @@ const criarCandidato = async (req, res) => {
     }
 
     // Construir URL da foto se foi enviada
-    let foto_url = null;
+    let fotoUpload = null;
     if (req.file) {
-      foto_url = `/uploads/candidatos/${req.file.filename}`;
+      fotoUpload = `/uploads/candidatos/${req.file.filename}`;
     }
+
+    // Usar foto_url do body ou a foto upload
+    const finalFotoUrl = foto_url || fotoUpload;
 
     const { data: candidato, error } = await supabase
       .from('candidatos')
@@ -133,7 +140,7 @@ const criarCandidato = async (req, res) => {
         nome,
         partido,
         eleicao_id,
-        foto_url
+        foto_url: finalFotoUrl
       })
       .select()
       .single();

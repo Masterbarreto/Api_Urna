@@ -1,4 +1,4 @@
-const { supabase } = require('../config/supabase');
+const { supabase } = require('../../api/config/supabase');
 const { successResponse, errorResponse, isValidCPF } = require('../utils/helpers');
 const logger = require('../utils/logger');
 const csv = require('csv-parser');

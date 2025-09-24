@@ -1,2 +1,2 @@
-const errorHandler = require('../src/middlewares/errorHandler');
+const errorHandler = require('../../src/middlewares/errorHandler');
 module.exports = errorHandler;

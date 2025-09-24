@@ -2,15 +2,15 @@ const express = require('express');
 const router = express.Router();
 
 // Importar rotas
-const authRoutes = require('../src/routes/auth');
-const dashboardRoutes = require('../src/routes/dashboard');
-const urnasRoutes = require('../src/routes/urnas');
-const eleicoesRoutes = require('../src/routes/eleicoes');
-const candidatosRoutes = require('../src/routes/candidatos');
-const eleitoresRoutes = require('../src/routes/eleitores');
-const resultadosRoutes = require('../src/routes/resultados');
-const auditoriaRoutes = require('../src/routes/auditoria');
-const urnaVotacaoRoutes = require('../src/routes/urnaVotacao');
+const authRoutes = require('../../src/routes/auth');
+const dashboardRoutes = require('../../src/routes/dashboard');
+const urnasRoutes = require('../../src/routes/urnas');
+const eleicoesRoutes = require('../../src/routes/eleicoes');
+const candidatosRoutes = require('../../src/routes/candidatos');
+const eleitoresRoutes = require('../../src/routes/eleitores');
+const resultadosRoutes = require('../../src/routes/resultados');
+const auditoriaRoutes = require('../../src/routes/auditoria');
+const urnaVotacaoRoutes = require('../../src/routes/urnaVotacao');
 
 // Rotas de autenticação
 router.use('/auth', authRoutes);

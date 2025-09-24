@@ -20,10 +20,8 @@ const listarEleitores = async (req, res) => {
         nome,
         cpf,
         email,
-        telefone,
         ja_votou,
         horario_voto,
-        created_at,
         eleicoes(titulo, status)
       `, { count: 'exact' });
 
@@ -73,10 +71,8 @@ const obterEleitor = async (req, res) => {
         nome,
         cpf,
         email,
-        telefone,
         ja_votou,
         horario_voto,
-        created_at,
         eleicoes(id, titulo, status)
       `)
       .eq('id', id)

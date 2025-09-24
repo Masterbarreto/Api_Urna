@@ -19,7 +19,6 @@ const listarCandidatos = async (req, res) => {
         partido,
         foto_url,
         total_votos,
-        created_at,
         eleicoes(titulo, status)
       `, { count: 'exact' });
 
@@ -66,7 +65,6 @@ const obterCandidato = async (req, res) => {
         partido,
         foto_url,
         total_votos,
-        created_at,
         eleicoes(id, titulo, status)
       `)
       .eq('id', id)

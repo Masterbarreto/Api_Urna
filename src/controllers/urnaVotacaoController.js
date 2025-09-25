@@ -129,14 +129,17 @@ const getCandidatos = async (req, res) => {
 // Controller para registrar voto
 const registrarVoto = async (req, res) => {
   try {
-    const { idCandidato } = req.body;
-    
-    // Se não for especificado, usar parâmetros da sessão (simulado)
-    // Em produção, estes dados viriam da sessão de votação
-    const eleitorMatricula = req.session?.eleitorMatricula || req.body.eleitorMatricula;
+    // Aceitar tanto o formato novo quanto o antigo
+    const candidatoId = req.body.candidato_id || req.body.idCandidato;
+    const eleitorMatricula = req.body.eleitor_matricula || req.body.eleitorMatricula || req.session?.eleitorMatricula;
+    const eleicaoId = req.body.eleicao_id || req.body.eleicao_id;
     
     if (!eleitorMatricula) {
-      return errorResponse(res, 'Sessão de votação inválida. Inicie o processo novamente.', 400);
+      return errorResponse(res, 'Matrícula do eleitor é obrigatória', 400);
+    }
+    
+    if (!candidatoId) {
+      return errorResponse(res, 'ID do candidato é obrigatório', 400);
     }
 
     // Buscar dados do eleitor e eleição
@@ -177,20 +180,20 @@ const registrarVoto = async (req, res) => {
 
     // Preparar dados do voto
     let tipoVoto = 'candidato';
-    let candidatoId = null;
+    let candidatoIdFinal = null;
 
-    if (idCandidato === 'NULO') {
+    if (candidatoId === 'NULO') {
       tipoVoto = 'nulo';
-    } else if (idCandidato === 'BRANCO') {
+    } else if (candidatoId === 'BRANCO') {
       tipoVoto = 'branco';
     } else {
-      candidatoId = idCandidato;
+      candidatoIdFinal = candidatoId;
       
       // Verificar se o candidato existe e pertence à eleição
       const { data: candidato, error: candidatoError } = await supabase
         .from('candidatos')
         .select('id')
-        .eq('id', idCandidato)
+        .eq('id', candidatoId)
         .eq('eleicao_id', eleitor.eleicao_id)
         .single();
 
@@ -201,7 +204,7 @@ const registrarVoto = async (req, res) => {
 
     // Comunicar com ESP32 (simulado)
     const esp32Response = await comunicarComESP32({
-      idCandidato,
+      idCandidato: candidatoId,
       tipoVoto,
       eleitorMatricula
     });
@@ -215,7 +218,7 @@ const registrarVoto = async (req, res) => {
       .from('votos')
       .insert({
         eleitor_matricula: eleitorMatricula,
-        candidato_id: candidatoId,
+        candidato_id: candidatoIdFinal,
         tipo_voto: tipoVoto,
         eleicao_id: eleitor.eleicao_id,
         hash_verificacao: generateAuditCode()
@@ -226,6 +229,15 @@ const registrarVoto = async (req, res) => {
     if (votoError) {
       throw votoError;
     }
+
+    // Atualizar eleitor como já votou
+    await supabase
+      .from('eleitores')
+      .update({ 
+        ja_votou: true,
+        horario_voto: new Date().toISOString()
+      })
+      .eq('id', eleitor.id);
 
     // Log de auditoria
     await supabase

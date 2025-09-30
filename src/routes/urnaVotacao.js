@@ -1,25 +1,10 @@
 const express = require('express');
 const router = express.Router();
+const { registrarVoto, validarEleitor, listarCandidatos } = require('../../src/controllers/urnaVotacaoController');
 
-const urnaVotacaoController = require('../controllers/urnaVotacaoController');
-const { validateSchema } = require('../middlewares/validation');
-const { validarEleitorSchema, votoSchema } = require('../utils/validation');
-
-// Rota para validar eleitor - POST /api/eleitores/validar
-router.post('/eleitores/validar', 
-  validateSchema(validarEleitorSchema),
-  urnaVotacaoController.validarEleitor
-);
-
-// Rota para obter candidatos - GET /api/candidatos
-router.get('/candidatos', 
-  urnaVotacaoController.getCandidatos
-);
-
-// Rota para registrar voto - POST /api/votos
-router.post('/votos', 
-  validateSchema(votoSchema),
-  urnaVotacaoController.registrarVoto
-);
+// Rotas simplificadas para teclado matricial
+router.post('/validar-eleitor', validarEleitor);
+router.post('/votar', registrarVoto);
+router.get('/candidatos', listarCandidatos);
 
 module.exports = router;

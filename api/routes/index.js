@@ -5,12 +5,12 @@ const router = express.Router();
 const authRoutes = require('../../src/routes/auth');
 const dashboardRoutes = require('../../src/routes/dashboard');
 const urnasRoutes = require('../../src/routes/urnas');
-const eleicoesRoutes = require('../../src/routes/eleicoes');
-const candidatosRoutes = require('../../src/routes/candidatos');
-const eleitoresRoutes = require('../../src/routes/eleitores');
-const resultadosRoutes = require('../../src/routes/resultados');
-const auditoriaRoutes = require('../../src/routes/auditoria');
-const urnaVotacaoRoutes = require('../../src/routes/urnaVotacao');
+const eleicoesRoutes = require('./eleicoes');
+const candidatosRoutes = require('./candidatos');
+const eleitoresRoutes = require('./eleitores');
+const votosRoutes = require('./votos');
+const urnaVotacaoRoutes = require('./urna-votacao');
+const urnaSimpleRoutes = require('./urna-simple'); // Nova rota
 
 // Rotas de autenticação
 router.use('/auth', authRoutes);
@@ -26,6 +26,7 @@ router.use('/v1/auditoria', auditoriaRoutes);
 
 // Rotas específicas da urna de votação
 router.use('/urna-votacao', urnaVotacaoRoutes);
+router.use('/urna-simple', urnaSimpleRoutes); // Nova rota simplificada
 
 // Rota de documentação
 router.get('/docs', (req, res) => {

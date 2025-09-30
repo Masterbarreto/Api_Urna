@@ -186,10 +186,52 @@ const excluirEleicao = async (req, res) => {
   }
 };
 
+// Controller para registrar um voto
+const registrarVoto = async (req, res) => {
+  try {
+    const { eleicaoId, candidatoId, eleitorId } = req.body;
+
+    // Buscar eleição e validar
+    const { data: eleicao, error: eleicaoError } = await supabase
+      .from('eleicoes')
+      .select('id, titulo, status, data_inicio, data_fim')
+      .eq('id', eleicaoId)
+      .single();
+
+    if (eleicaoError || !eleicao) {
+      return errorResponse(res, 'Eleição não encontrada', 404);
+    }
+
+    // NOVA LÓGICA: Se status é "ativa", ignora validação de data
+    if (eleicao.status !== 'ativa') {
+      return errorResponse(res, 'Eleição não está ativa no momento.', 409);
+    }
+
+    // Se status é "ativa", pula a validação de data
+    // Comentar ou remover esta validação:
+    /*
+    const agora = new Date();
+    const dataInicio = new Date(eleicao.data_inicio);
+    const dataFim = new Date(eleicao.data_fim);
+
+    if (agora < dataInicio || agora > dataFim) {
+      return errorResponse(res, 'Eleição não está no período de votação.', 409);
+    }
+    */
+
+    // Resto da lógica para registrar o voto
+    // ...
+
+  } catch (error) {
+    // ... tratamento de erro ...
+  }
+};
+
 module.exports = {
   listarEleicoes,
   obterEleicao,
   criarEleicao,
   atualizarEleicao,
-  excluirEleicao
+  excluirEleicao,
+  registrarVoto
 };
